@@ -146,7 +146,7 @@ var jsPDF = (function(global) {
 	 * @constructor
 	 * @private
 	 */
-	function jsPDF(orientation, unit, format, compressPdf) {
+	function jsPDF(orientation, unit, format, compressPdf, autoAddFonts) {
 		var options = {};
 
 		if (typeof orientation === 'object') {
@@ -156,12 +156,14 @@ var jsPDF = (function(global) {
 			unit = options.unit || unit;
 			format = options.format || format;
 			compressPdf = options.compress || options.compressPdf || compressPdf;
+			autoAddFonts = options.autoAddFonts !== undefined ? options.autoAddFonts : autoAddFonts;
 		}
 
 		// Default options
-		unit        = unit || 'mm';
-		format      = format || 'a4';
-		orientation = ('' + (orientation || 'P')).toLowerCase();
+		unit         = unit || 'mm';
+		format       = format || 'a4';
+		orientation  = ('' + (orientation || 'P')).toLowerCase();
+		autoAddFonts = (autoAddFonts === undefined) ? true : autoAddFonts;
 
 		var format_as_string = ('' + format).toLowerCase(),
 			compress = !!compressPdf && typeof Uint8Array === 'function',
@@ -2003,8 +2005,10 @@ var jsPDF = (function(global) {
 		// continuing initialization of jsPDF Document object
 		//////////////////////////////////////////////////////
 		// Add the first page automatically
-		addFonts();
-		activeFontKey = 'F1';
+		if (autoAddFonts) {
+			addFonts();
+			activeFontKey = 'F1';
+		}
 		_addPage(format, orientation);
 
 		events.publish('initialized');
